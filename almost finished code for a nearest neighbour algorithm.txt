@@ -1,0 +1,44 @@
+//Stolen from my Prims algorithm function
+std::vector<std::vector<float>> Graph::getPrimsMST(){
+	std::vector<std::vector<float>> mst_matrix; //Matrix for MST
+	std::vector<int> deleted_rows;
+	std::vector<std::pair<int, int>> selected_edges;
+	int current_column = 0;
+	//Initialise MST matrix
+#pragma region
+	for (int i = 0; i < distance_matrix.size(); i++) {
+		std::vector<float> vect;
+		mst_matrix.push_back(vect);
+		for (int j = 0; j < distance_matrix.size(); j++) {
+			mst_matrix[i].push_back(-1);
+		}
+	}
+#pragma endregion
+	while (deleted_rows.size() != distance_matrix.size()) { //While not all rows haven't been deleted
+		deleted_rows.push_back(current_column);
+		std::vector<std::pair<int, int>> possible_edges;
+		for (int k = 0; k < distance_matrix.size(); k++) { //Get all elements of the current column
+			//possible_edges.push_back(distance_matrix[k][current_column]);
+			possible_edges.push_back(std::make_pair(k, current_column));
+		}
+		std::sort(possible_edges.begin(), possible_edges.end()); //Sort the possible edges in descending order
+		for (int h = 0; h < possible_edges.size(); h++) {
+			bool row_is_deleted = false;
+			for (int l = 0; l < deleted_rows.size(); l++) {
+				if (deleted_rows[l] == possible_edges[h].first) {
+					row_is_deleted = true;
+				}
+			}
+			if (distance_matrix[possible_edges[h].first][possible_edges[h].second] == -1 || row_is_deleted == true) {
+				continue; //Ignore empty edges and edges in deleted rows
+			}
+			else {
+				selected_edges.push_back(std::make_pair(possible_edges[h].first, possible_edges[h].second)); //Store the lowest weighing edge in the column
+				deleted_rows.push_back(h);
+				current_column = h;
+				break;
+			}
+		}
+	}
+	return mst_matrix;
+}
